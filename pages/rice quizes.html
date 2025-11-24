@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>แบบทดสอบความรู้เรื่องข้าว</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --rice-gold: #D4AF37;
+            --rice-green: #2F9E44;
+            --water-blue: #0EA5E9;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Prompt', sans-serif;
+        }
+        
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2rem;
+        }
+        
+        .option {
+            background: #f3f4f6;
+            border: 2px solid transparent;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            margin: 0.75rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            background: #e5e7eb;
+            transform: translateX(5px);
+        }
+        
+        .option.selected {
+            background: #dbeafe;
+            border-color: #3b82f6;
+        }
+        
+        .option.correct {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+        
+        .option.incorrect {
+            background: #fee2e2;
+            border-color: #ef4444;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-bar {
+            height: 0.75rem;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="question-card text-center">
+            <div class="text-6xl mb-6">🌾</div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">แบบทดสอบความรู้เรื่องข้าว</h1>
+            <p class="text-xl text-gray-600 mb-8">ทดสอบความเข้าใจเกี่ยวกับการใช้ประโยชน์จากข้าวทุกส่วน</p>
+            <div class="bg-blue-50 rounded-xl p-6 mb-8">
+                <p class="text-lg text-gray-700">
+                    <strong>รูปแบบ:</strong> คำถามปรนัย 10 ข้อ (สุ่มจากทั้งหมด 20 ข้อ)<br>
+                    <strong>เวลา:</strong> ไม่จำกัด<br>
+                    <strong>ผ่าน:</strong> 7 ข้อขึ้นไป
+                </p>
+            </div>
+            <div class="flex gap-4 justify-center">
+                <button onclick="startQuiz()" class="btn btn-primary">
+                    🎮 เริ่มทำแบบทดสอบ
+                </button>
+                <a href="../index.html" class="btn btn-primary inline-block">
+                    ← กลับหน้าหลัก
+                </a>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="hidden">
+            <!-- Progress -->
+            <div class="question-card">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-semibold text-gray-700">คำถามที่ <span id="currentQuestion">1</span>/10</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 10%"></div>
+                </div>
+            </div>
+
+            <!-- Question -->
+            <div class="question-card">
+                <h2 id="questionText" class="text-2xl font-bold text-gray-800 mb-6"></h2>
+                <div id="optionsContainer"></div>
+                <div class="mt-6 flex justify-between items-center">
+                    <a href="../index.html" class="btn btn-primary inline-block">
+                        ← กลับหน้าหลัก
+                    </a>
+                    <button id="nextBtn" onclick="nextQuestion()" class="btn btn-primary" disabled>
+                        ข้อต่อไป →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="hidden question-card text-center">
+            <div id="resultEmoji" class="text-6xl mb-6"></div>
+            <h1 id="resultTitle" class="text-4xl font-bold mb-4"></h1>
+            <p id="resultMessage" class="text-xl text-gray-600 mb-8"></p>
+            <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-8 mb-8">
+                <div class="text-5xl font-bold text-purple-600 mb-2">
+                    <span id="finalScore">0</span>/10
+                </div>
+                <p class="text-lg text-gray-700">คะแนนที่ได้</p>
+            </div>
+            <div class="flex gap-4 justify-center">
+                <button onclick="restartQuiz()" class="btn btn-primary">
+                    🔄 ทำใหม่อีกครั้ง
+                </button>
+                <a href="../index.html" class="btn btn-primary inline-block">
+                    ← กลับหน้าหลัก
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Script loaded successfully');
+        
+        // Question Bank (20 questions total)
+        const questionBank = [
+            {
+                question: "ข้าวกล้องมีคุณค่าทางโภชนาการสูงกว่าข้าวขาว เพราะอะไร?",
+                options: [
+                    "มีน้ำตาลน้อยกว่า",
+                    "ยังคงมีรำและจมูกข้าวที่อุดมด้วยใยอาหารและวิตามิน",
+                    "ราคาแพงกว่า",
+                    "ย่อยได้เร็วกว่า"
+                ],
+                correct: 1
+            },
+            {
+                question: "สารแอนโทไซยานินในข้าวดำมีคุณสมบัติพิเศษอะไร?",
+                options: [
+                    "ช่วยให้นอนหลับง่าย",
+                    "ต้านอนุมูลอิสระและลดการอักเสบในร่างกาย",
+                    "เพิ่มความจำ",
+                    "ลดอาการปวดข้อ"
+                ],
+                correct: 1
+            },
+            {
+                question: "ทำไมน้ำมันรำข้าวจึงเหมาะกับการทอดอาหารอุณหภูมิสูง?",
+                options: [
+                    "ราคาถูก",
+                    "มีกลิ่นหอม",
+                    "มีจุดเกิดควันสูง ไม่ย่อยสลายง่ายเมื่อร้อน",
+                    "มีสีสวย"
+                ],
+                correct: 2
+            },
+            {
+                question: "แกลบมีส่วนประกอบพิเศษที่ทำให้เหมาะเป็นวัสดุก่อสร้างคืออะไร?",
+                options: [
+                    "โปรตีนสูง",
+                    "ซิลิกาที่ช่วยเพิ่มความแข็งแรง",
+                    "น้ำตาลสูง",
+                    "ไขมันสูง"
+                ],
+                correct: 1
+            },
+            {
+                question: "เถ้าแกลบช่วยเพิ่มความแข็งแรงให้คอนกรีตได้อย่างไร?",
+                options: [
+                    "เป็นสีสวย",
+                    "มีซิลิกาที่ทำปฏิกิริยากับปูนซีเมนต์",
+                    "ทำให้น้ำหนักเบา",
+                    "ลดต้นทุน"
+                ],
+                correct: 1
+            },
+            {
+                question: "ปัญหาหลักของการเผาฟางข้าวในนาคืออะไร?",
+                options: [
+                    "ใช้เวลานาน",
+                    "สร้างฝุ่นละออง สูญเสียธาตุอาหาร และปล่อยก๊าซเรือนกระจก",
+                    "ทำให้ดินแข็ง",
+                    "ต้นทุนสูง"
+                ],
+                correct: 1
+            },
+            {
+                question: "ฟางข้าวสามารถแปรรูปเป็นพลังงานทางเลือกได้หลายรูปแบบ ยกเว้น",
+                options: [
+                    "ก๊าซชีวภาพ (มีเทน)",
+                    "ไบโอเอทานอล",
+                    "ไบโอดีเซล",
+                    "ไบโอชาร์"
+                ],
+                correct: 2
+            },
+            {
+                question: "รากข้าวมีบทบาทสำคัญต่อดินอย่างไร?",
+                options: [
+                    "ดูดน้ำออกหมด",
+                    "ยึดเกาะดิน ป้องกันการชะล้าง และเพิ่มอินทรียวัตถุเมื่อสลายตัว",
+                    "ทำลายโครงสร้างดิน",
+                    "ดูดธาตุอาหารหมด"
+                ],
+                correct: 1
+            },
+            {
+                question: "ระบบนา-ปลาช่วยลดการใช้สารเคมีได้อย่างไร?",
+                options: [
+                    "ปลาช่วยรดน้ำ",
+                    "ปลากินแมลงศัตรูพืชและวัชพืช",
+                    "ปลาให้ปุ๋ยเคมี",
+                    "ปลาช่วยเก็บเกี่ยว"
+                ],
+                correct: 1
+            },
+            {
+                question: "AWD (Alternate Wetting and Drying) คือเทคนิคการจัดการน้ำแบบไหน?",
+                options: [
+                    "รดน้ำทุกวัน",
+                    "ปล่อยให้นาแห้งและเปียกสลับกัน เพื่อลดก๊าซมีเทน",
+                    "ท่วมน้ำตลอดเวลา",
+                    "ไม่รดน้ำเลย"
+                ],
+                correct: 1
+            },
+            {
+                question: "การหมักข้าวช่วยเพิ่มคุณค่าทางโภชนาการด้วยการเพิ่มอะไร?",
+                options: [
+                    "น้ำตาลและเกลือ",
+                    "วิตามิน B, GABA และโปรไบโอติก",
+                    "ไขมันและโปรตีน",
+                    "วิตามิน C และแคลเซียม"
+                ],
+                correct: 1
+            },
+            {
+                question: "ข้าวงอก (GABA rice) มีสาร GABA ที่มีประโยชน์ต่อระบบใด?",
+                options: [
+                    "ระบบทางเดินอาหาร",
+                    "ระบบประสาทและช่วยลดความเครียด",
+                    "ระบบหายใจ",
+                    "ระบบไหลเวียนโลหิต"
+                ],
+                correct: 1
+            },
+            {
+                question: "รำข้าวที่สกัดน้ำมันออกแล้ว (Defatted rice bran) ยังมีประโยชน์อย่างไร?",
+                options: [
+                    "ไม่มีประโยชน์ ต้องทิ้ง",
+                    "ใช้เป็นอาหารสัตว์ ปุ๋ย และแหล่งสารออกฤทธิ์ทางชีวภาพ",
+                    "ใช้เป็นเชื้อเพลิงเท่านั้น",
+                    "เป็นของเสีย"
+                ],
+                correct: 1
+            },
+            {
+                question: "ไบโอชาร์ (Biochar) จากฟางข้าวช่วยรับมือกับการเปลี่ยนแปลงสภาพภูมิอากาศได้อย่างไร?",
+                options: [
+                    "ปล่อยคาร์บอนออกสู่อากาศ",
+                    "กักเก็บคาร์บอนในดินระยะยาว และปรับปรุงคุณภาพดิน",
+                    "เพิ่มอุณหภูมิดิน",
+                    "ทำลายจุลินทรีย์ในดิน"
+                ],
+                correct: 1
+            },
+            {
+                question: "แป้งข้าวเป็นทางเลือกที่ดีสำหรับผู้ที่มีปัญหาสุขภาพใด?",
+                options: [
+                    "เบาหวาน",
+                    "แพ้กลูเตน (Celiac disease)",
+                    "ความดันสูง",
+                    "โรคหัวใจ"
+                ],
+                correct: 1
+            },
+            {
+                question: "น้ำนมข้าวเหมาะกับผู้บริโภคกลุ่มใด?",
+                options: [
+                    "เฉพาะเด็ก",
+                    "ผู้ที่แพ้นมวัว หรือผู้ที่ต้องการลดการบริโภคผลิตภัณฑ์จากสัตว์",
+                    "เฉพาะผู้สูงอายุ",
+                    "เฉพาะนักกีฬา"
+                ],
+                correct: 1
+            },
+            {
+                question: "แนวคิดเศรษฐกิจหมุนเวียนจากข้าวมุ่งเน้นอะไรเป็นหลัก?",
+                options: [
+                    "ส่งออกข้าวให้มากที่สุด",
+                    "ใช้ประโยชน์จากทุกส่วนของต้นข้าว ลดของเสีย สร้างมูลค่าเพิ่ม",
+                    "ปลูกข้าวให้ได้มากที่สุด",
+                    "ลดราคาข้าว"
+                ],
+                correct: 1
+            },
+            {
+                question: "การหยุดเผาฟางข้าวช่วยอนุรักษ์ทรัพยากรในดินอย่างไร?",
+                options: [
+                    "ทำให้ดินร้อนขึ้น",
+                    "รักษาธาตุอาหาร NPK ไว้ในดิน และป้องกันการสูญเสียอินทรียวัตถุ",
+                    "เพิ่มความชื้นในดิน",
+                    "ทำให้ดินแข็งขึ้น"
+                ],
+                correct: 1
+            },
+            {
+                question: "ระบบนา-เป็ดช่วยลดต้นทุนการผลิตได้อย่างไร?",
+                options: [
+                    "เป็ดช่วยเก็บเกี่ยว",
+                    "เป็ดกินวัชพืชและแมลง ลดค่าสารเคมี และให้มูลเป็นปุ๋ย",
+                    "เป็ดช่วยรดน้ำ",
+                    "เป็ดขายได้ราคาดี"
+                ],
+                correct: 1
+            },
+            {
+                question: "แกลบสามารถพัฒนาเป็นเทคโนโลยีใหม่ในอนาคตได้ เช่น",
+                options: [
+                    "ทำอาหารสำเร็จรูป",
+                    "ขั้วแบตเตอรี่ซิลิกอน และวัสดุแอโรเจลสำหรับฉนวนกันความร้อน",
+                    "ทำเสื้อผ้า",
+                    "ทำพลาสติกชีวภาพ"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let answered = false;
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function startQuiz() {
+            // Randomly select 10 questions from the question bank
+            const shuffled = shuffleArray(questionBank);
+            currentQuestions = shuffled.slice(0, 10);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            answered = false;
+            selectedAnswer = null;
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('nextBtn').disabled = true;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            updateProgress();
+        }
+
+        function selectAnswer(index) {
+            if (answered) return;
+            
+            selectedAnswer = index;
+            answered = true;
+            
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((option, i) => {
+                option.onclick = null;
+                if (i === selectedAnswer) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            // Check answer
+            const question = currentQuestions[currentQuestionIndex];
+            if (selectedAnswer === question.correct) {
+                score++;
+            }
+            
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < currentQuestions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResult() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            
+            document.getElementById('finalScore').textContent = score;
+            
+            const percentage = (score / currentQuestions.length) * 100;
+            const resultEmoji = document.getElementById('resultEmoji');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            
+            if (score >= 9) {
+                resultEmoji.textContent = '🏆';
+                resultTitle.textContent = 'ยอดเยี่ยม!';
+                resultTitle.className = 'text-4xl font-bold mb-4 text-yellow-600';
+                resultMessage.innerHTML = 'คุณเป็นผู้เชี่ยวชาญด้านข้าวแล้ว!<br><span class="text-green-600 font-bold mt-4 inline-block">✓ ผ่านแล้ว ไปรับตราประทับที่คุณครูประจำฐานได้เลย</span>';
+            } else if (score >= 7) {
+                resultEmoji.textContent = '🎉';
+                resultTitle.textContent = 'ผ่าน!';
+                resultTitle.className = 'text-4xl font-bold mb-4 text-green-600';
+                resultMessage.innerHTML = 'ความรู้ของคุณเกี่ยวกับข้าวดีมาก!<br><span class="text-green-600 font-bold mt-4 inline-block">✓ ผ่านแล้ว ไปรับตราประทับที่คุณครูประจำฐานได้เลย</span>';
+            } else if (score >= 5) {
+                resultEmoji.textContent = '😊';
+                resultTitle.textContent = 'อาจจะยังน้า...';
+                resultTitle.className = 'text-4xl font-bold mb-4 text-blue-600';
+                resultMessage.textContent = 'ลองอ่านเนื้อหาอีกครั้งแล้วทำใหม่นะ';
+            } else {
+                resultEmoji.textContent = '📚';
+                resultTitle.textContent = 'อาจจะยังน้า...';
+                resultTitle.className = 'text-4xl font-bold mb-4 text-red-600';
+                resultMessage.textContent = 'กลับไปอ่านเนื้อหาให้ดีก่อนทำแบบทดสอบอีกครั้งนะ';
+            }
+        }
+
+        function restartQuiz() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
