@@ -218,9 +218,9 @@
             <p class="text-xl text-gray-600 mb-8">ทดสอบความเข้าใจเกี่ยวกับการใช้ประโยชน์จากข้าวทุกส่วน</p>
             <div class="bg-blue-50 rounded-xl p-6 mb-8">
                 <p class="text-lg text-gray-700">
-                    <strong>รูปแบบ:</strong> คำถามปรนัย 10 ข้อ (สุ่มจากทั้งหมด 20 ข้อ)<br>
+                    <strong>รูปแบบ:</strong> คำถามปรนัย 5 ข้อ (สุ่มจากทั้งหมด 20 ข้อ)<br>
                     <strong>เวลา:</strong> ไม่จำกัด<br>
-                    <strong>ผ่าน:</strong> 7 ข้อขึ้นไป
+                    <strong>ผ่าน:</strong> 4 ข้อขึ้นไป
                 </p>
             </div>
             <div class="flex gap-4 justify-center">
@@ -238,10 +238,10 @@
             <!-- Progress -->
             <div class="question-card">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-semibold text-gray-700">คำถามที่ <span id="currentQuestion">1</span>/10</span>
+                    <span class="text-lg font-semibold text-gray-700">คำถามที่ <span id="currentQuestion">1</span>/5</span>
                 </div>
                 <div class="progress-bar">
-                    <div id="progressFill" class="progress-fill" style="width: 10%"></div>
+                    <div id="progressFill" class="progress-fill" style="width: 20%"></div>
                 </div>
             </div>
 
@@ -267,7 +267,7 @@
             <p id="resultMessage" class="text-xl text-gray-600 mb-8"></p>
             <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-8 mb-8">
                 <div class="text-5xl font-bold text-purple-600 mb-2">
-                    <span id="finalScore">0</span>/10
+                    <span id="finalScore">0</span>/5
                 </div>
                 <p class="text-lg text-gray-700">คะแนนที่ได้</p>
             </div>
@@ -518,7 +518,7 @@
                     <div class="mini-card"></div>
                 </div>
                 <h3 class="text-2xl font-bold text-gray-800 text-center">🎲 กำลังสุ่มคำถาม...</h3>
-                <p class="text-gray-600 text-center mt-2">กำลังเลือก 10 ข้อจากทั้งหมด 20 ข้อ</p>
+                <p class="text-gray-600 text-center mt-2">กำลังเลือก 5 ข้อจากทั้งหมด 20 ข้อ</p>
             `;
             document.body.appendChild(shuffleIndicator);
             
@@ -528,9 +528,9 @@
             
             // Wait for animation to complete
             setTimeout(() => {
-                // Randomly select 10 questions from the question bank
+                // Randomly select 5 questions from the question bank
                 const shuffled = shuffleArray(questionBank);
-                currentQuestions = shuffled.slice(0, 10);
+                currentQuestions = shuffled.slice(0, 5);
                 
                 currentQuestionIndex = 0;
                 score = 0;
@@ -658,17 +658,17 @@
             const resultTitle = document.getElementById('resultTitle');
             const resultMessage = document.getElementById('resultMessage');
             
-            if (score >= 9) {
+            if (score === 5) {
                 resultEmoji.textContent = '🏆';
                 resultTitle.textContent = 'ยอดเยี่ยม!';
                 resultTitle.className = 'text-4xl font-bold mb-4 text-yellow-600';
                 resultMessage.innerHTML = 'คุณเป็นผู้เชี่ยวชาญด้านข้าวแล้ว!<br><span class="text-green-600 font-bold mt-4 inline-block">✓ ผ่านแล้ว ไปรับตราประทับที่คุณครูประจำฐานได้เลย</span>';
-            } else if (score >= 7) {
+            } else if (score >= 4) {
                 resultEmoji.textContent = '🎉';
                 resultTitle.textContent = 'ผ่าน!';
                 resultTitle.className = 'text-4xl font-bold mb-4 text-green-600';
                 resultMessage.innerHTML = 'ความรู้ของคุณเกี่ยวกับข้าวดีมาก!<br><span class="text-green-600 font-bold mt-4 inline-block">✓ ผ่านแล้ว ไปรับตราประทับที่คุณครูประจำฐานได้เลย</span>';
-            } else if (score >= 5) {
+            } else if (score >= 3) {
                 resultEmoji.textContent = '😊';
                 resultTitle.textContent = 'อาจจะยังน้า...';
                 resultTitle.className = 'text-4xl font-bold mb-4 text-blue-600';
